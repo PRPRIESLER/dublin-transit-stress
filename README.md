@@ -10,21 +10,21 @@ This repository is under active development. Check below for the latest roadmap 
 
 1. Introduction
 
-2. Project Status & Roadmap
+2. Motivation 
 
-3. Data Collection
+3. Project Status & Roadmap
 
-4. Repository Structure
+4. Data Collection
 
 5. Methodology (Upcoming)
 
 6. Key Findings & Visualizations (Upcoming)
 
-7. Installation & Usage
+7. Installation & Usage (Upcoming)
 
-8. CI / Badges
+8. Repository Structure (Upcoming)
 
-9. Contributing & Collaboration
+9. Contributing & Collaboration (Upcoming)
 
 10. License
 
