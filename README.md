@@ -1,8 +1,8 @@
 # Dublin Transit Stress Analysis 📊
-### Project Overview
+## Project Overview
 A comprehensive analysis of stress factors for Dublin’s public transit users, leveraging multi-modal data collection (GPS traces, accelerometer readings, weather data, and service schedules) to identify patterns, correlations, and actionable insights.This repository contains the code, data, and documentation for analyzing stress levels in Dublin's public transit system. The goal is to identify factors contributing to commuter stress and develop visualization and modeling tools to better understand and mitigate these stressors.
 
-### Project Status: 
+#### Project Status: 
 This repository is under active development. Check below for the latest roadmap and updates.
 
 ## Table of Contents
@@ -33,7 +33,7 @@ This repository is under active development. Check below for the latest roadmap 
 
 Welcome to the Dublin Transit Stress Analysis project! This repo captures our ongoing effort to quantify and understand stress factors affecting Dublin’s transit riders. As we collect and refine data, this page will evolve with new insights, visualizations, and tools.
 
-# Motivation
+## Motivation
 Understanding stress patterns among transit users can help Dublin's transportation authorities and city planners improve service quality and commuter well-being. This project aims to:
 
 - Collect and preprocess transit usage and environmental data.
