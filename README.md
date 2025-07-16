@@ -49,11 +49,11 @@ Understanding stress patterns among transit users can help Dublin's transportati
 
 | Phase              | Description                                       | ETA       |
 |--------------------|---------------------------------------------------|-----------|
-| Data Collection    | GPS, IMU, weather, schedule data ingestion        | Q3 2025   |
-| Data Cleaning      | Preprocessing, feature engineering                | Q4 2025   |
-| Exploratory EDA    | Visualizations, hotspot identification            | Q1 2026   |
-| Modeling           | Predictive models for stress score                | Q2 2026   |
-| Dashboard & Report | Interactive dashboard & final report publication  | Q3 2026   |
+| Data Collection    | GPS, IMU, weather, schedule data ingestion        | 1 Week    |
+| Data Cleaning      | Preprocessing, feature engineering                | 3-4 Days  |
+| Exploratory EDA    | Visualizations, hotspot identification            | 1 Week    |
+| Modeling           | Predictive models for stress score                | 1 Week    |
+| Dashboard & Report | Interactive dashboard & final report publication  | 1 Week    |
 
 *Stay tuned for progress updates and intermediate deliverables.*
 
@@ -63,9 +63,9 @@ Current sources: raw motion and location logs combined with external transit sch
 
 | Source       | Description                                        | Format      | Frequency      |
 |--------------|----------------------------------------------------|-------------|----------------|
-| GPS & IMU    | On-vehicle sensors capturing speed and acceleration | CSV / JSON  | 1 Hz           |
-| Weather API  | Temperature, humidity, precipitation               | JSON        | 1 hour         |
-| Schedule     | Dublin Bus / Luas timetable & delay reports        | GTFS / JSON | Daily updates  |
+| Vehicle Data | On-vehicle sensors capturing live position & speed | GTFS CSV / JSON  | Per Min          |
+| Weather API  | Temperature, humidity, precipitation               | JSON        | 15 Mins        |
+| Delays       | Dublin Bus / Luas timetable & delay reports        | GTFS CSV / JSON | Per Min  |
 
 ## Methodology (Upcoming)
 
