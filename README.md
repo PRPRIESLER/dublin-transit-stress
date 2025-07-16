@@ -49,7 +49,7 @@ Understanding stress patterns among transit users can help Dublin's transportati
 
 | Phase              | Description                                       | ETA       |
 |--------------------|---------------------------------------------------|-----------|
-| Data Collection    | GPS, IMU, weather, schedule data ingestion        | 1 Week    |
+| Data Collection    | GPS, IMU, weather, schedule data ingestion        | 3 Weeks    |
 | Data Cleaning      | Preprocessing, feature engineering                | 3-4 Days  |
 | Exploratory EDA    | Visualizations, hotspot identification            | 1 Week    |
 | Modeling           | Predictive models for stress score                | 1 Week    |
