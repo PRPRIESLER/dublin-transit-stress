@@ -2,6 +2,7 @@
 /*
 ./gtfs_static/stop_times.txt
 # allow these top-level items
+!dockerfile
 !.gitignore
 !requirements.txt
 !runtime.txt
