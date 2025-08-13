@@ -1,0 +1,16 @@
+data_hist filter=lfs diff=lfs merge=lfs -text
+notebooks filter=lfs diff=lfs merge=lfs -text
+etl.log filter=lfs diff=lfs merge=lfs -text
+norm_codes filter=lfs diff=lfs merge=lfs -text
+app filter=lfs diff=lfs merge=lfs -text
+cache filter=lfs diff=lfs merge=lfs -text
+data_live filter=lfs diff=lfs merge=lfs -text
+README.md filter=lfs diff=lfs merge=lfs -text
+collectors filter=lfs diff=lfs merge=lfs -text
+join_minute_with_weather.py filter=lfs diff=lfs merge=lfs -text
+join_daily.py filter=lfs diff=lfs merge=lfs -text
+logs filter=lfs diff=lfs merge=lfs -text
+nightly_etl.py filter=lfs diff=lfs merge=lfs -text
+dashboard filter=lfs diff=lfs merge=lfs -text
+flag_vanished.py filter=lfs diff=lfs merge=lfs -text
+gtfs_static filter=lfs diff=lfs merge=lfs -text
