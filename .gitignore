@@ -15,7 +15,7 @@
 !join_minute_with_weather.py
 !notebooks
 !/gtfs_static/census/
-#!data_hist/
+!data_hist/*/norms/
 # optional: macOS & editor artifacts
 .DS_Store
 *.code-workspace
