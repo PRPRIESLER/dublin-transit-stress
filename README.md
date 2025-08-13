@@ -3,7 +3,7 @@
 A comprehensive analysis of stress factors for Dublin’s public transit users, leveraging multi-modal data collection (GPS traces, accelerometer readings, weather data, and service schedules) to identify patterns, correlations, and actionable insights.This repository contains the code, data, and documentation for analyzing stress levels in Dublin's public transit system. The goal is to identify factors contributing to commuter stress and develop visualization and modeling tools to better understand and mitigate these stressors.
 
 #### Project Status: 
-![Data Collection Phase](https://img.shields.io/badge/status-data%20collection-blue)
+![Final Deployment Phase](https://img.shields.io/badge/status-data%20collection-blue)
 This repository is under active development. Check below for the latest roadmap and updates.
 
 ## Table of Contents
