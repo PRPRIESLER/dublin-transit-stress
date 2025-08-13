@@ -19,10 +19,7 @@ from pathlib import Path
 from norm_codes.geo.segment_utils import build_segments, snap_minutes
 
 # ─── Mapbox token ───────────────────────────────────────────────
-os.environ["MAPBOX_API_KEY"] = (
-    "pk.eyJ1IjoicGluYWtpcGFuaSIsImEiOiJjbWRscGZsbGQxYWg0MmtzZHZ5YTY1Mjk4In0."
-    "ku2LVM93BTD2tkhwel-qZg"
-)
+os.environ["MAPBOX_API_KEY"] = st.secrets.get("MAPBOX_API_KEY", "")
 
 # ─── Optional Geo stack for ED polygons ─────────────────────────
 try:
