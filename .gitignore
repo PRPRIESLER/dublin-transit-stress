@@ -18,3 +18,4 @@
 .DS_Store
 *.code-workspace
 .vscode/
+notebooks/00_data_overview.ipnyb
