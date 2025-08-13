@@ -1,0 +1,20 @@
+# ignore everything by default
+/*
+
+# allow these top-level items
+!.gitignore
+!requirements.txt
+!runtime.txt
+!.streamlit/
+!app/
+!norm_codes/
+!gtfs_static/
+!data_hist/
+!nightly_etl.py
+!join_daily.py
+!join_minute_with_weather.py
+!notebooks
+# optional: macOS & editor artifacts
+.DS_Store
+*.code-workspace
+.vscode/
