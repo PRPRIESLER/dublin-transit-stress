@@ -1,0 +1,100 @@
+agency_id,agency_name,agency_url,agency_timezone
+7778000,Citylink,https://www.citylink.ie/,Europe/London
+7778002,"Nitelink, Dublin Bus",https://www.dublinbus.ie/,Europe/London
+7778006,Go-Ahead Ireland,https://www.goaheadireland.ie/,Europe/London
+7778008,Bus Éireann Waterford,https://www.buseireann.ie,Europe/London
+7778013,Bernard Kavanagh & Sons,http://www.bernardkavanaghcoaches.com,Europe/London
+7778014,LUAS,https://luas.ie,Europe/London
+7778017,Iarnród Éireann / Irish Rail,https://www.irishrail.ie/en-ie/,Europe/London
+7778019,Bus Átha Cliath – Dublin Bus,https://www.dublinbus.ie/,Europe/London
+7778020,Bus Éireann,https://buseireann.ie,Europe/London
+7778021,Go-Ahead Ireland,https://www.goaheadireland.ie/,Europe/London
+7778024,Aircoach,https://www.aircoach.ie/,Europe/London
+7778026,Selnec Ltd,https://royalcounty.ie/,Europe/London
+7778028,City Direct,https://www.citydirect.ie/,Europe/London
+7778030,Catherine Madigan,http://www.transportforireland.ie,Europe/London
+7778032,Corduff Travel,https://cordufftravel.ie/,Europe/London
+7778036,Express Bus,https://expressbus.ie/,Europe/London
+7778038,Farragher International Travel Services,https://www.transportforireland.ie,Europe/London
+7778042,Halpenny Transport,https://www.halpennytravel.com/,Europe/London
+7778044,J.J Kavanagh & Sons,https://jjkavanagh.ie/#,Europe/London
+7778046,Joseph Foley,https://www.transportforireland.ie,Europe/London
+7778048,Kearns Transport,https://kearnstransport.com/,Europe/London
+7778052,Mangan Tours,https://www.mangantours.ie/,Europe/London
+7778054,McGeehan Coaches,http://www.mcgeehancoaches.com/,Europe/London
+7778056,McGrath Coaches,https://mcgrathcoaches.com/,Europe/London
+7778058,Michael Gray Coach Hire,https://www.michaelgraycoaches.ie/,Europe/London
+7778060,PJ Martley,https://martleys.com/,Europe/London
+7778062,Slieve Bloom Coach Tours,http://www.slievebloomcoaches.ie/,Europe/London
+7778066,Swords Express,https://www.swordsexpress.com/,Europe/London
+7778068,Tralee People's Bus Service,http://www.transportforireland.ie,Europe/London
+7778075,Healy Bus,http://www.healybus.com/,Europe/London
+7778077,McGonagle Bus and Coach Hire,http://www.mcgonaglebus.ie/,Europe/London
+7778080,Barrys Coaches,http://www.barryscoaches.com/,Europe/London
+7778082,Dunnes Coaches,https://dunnescoaches.com/,Europe/London
+7778083,K. Buggy Coaches Llimited,https://www.kbuggycoaches.com/,Europe/London
+7778084,Harrington's Ardgroom,https://www.harringtonsardgroom.com/bus-service,Europe/London
+7778086,Matthew Whelan Mini Bus Hire,https://www.transportforireland.ie,Europe/London
+7778090,Kelly Travel,http://www.kellytravel.ie/,Europe/London
+7778092,Westlink Coaches,http://www.westlinkcoaches.ie/,Europe/London
+7778093,Patrick Gallagher Travel,https://www.patrickgallaghertravel.com/patrick-gallagher-bus-timetables/,Europe/London
+7778094,St.Kevin's Bus Service,http://www.glendaloughbus.com/,Europe/London
+7778097,Andrew Wharton,http://www.andrewwhartoncoachhire.com/,Europe/London
+7778098,West Cork Connect,https://westcorkconnect.ie/,Europe/London
+7778099,Gleneagle Hotel (Killarney) Ltd,https://www.gleneaglehotel.com/,Europe/London
+7778100,Keelings Retail UC,https://www.transportforireland.ie,Europe/London
+7778101,Balbriggan Express,http://www.carolancoachhire.ie/,Europe/London
+7778102,Flagline Coaches,https://www.transportforireland.ie,Europe/London
+7778105,Roscommon Coaches,https://roscommoncoaches.ie/,Europe/London
+7778108,Dublin Express,https://www.dublinexpress.ie/,Europe/London
+7778151,Burkesbus,https://burkesbus.ie/,Europe/London
+7778153,Collins Coaches,https://collinscoaches.ie/,Europe/London
+7778155,Dublin Coach,https://www.dublincoach.ie/,Europe/London
+7778157,Bus Feda Teoranta,https://busfeda.ie/,Europe/London
+7778159,Lally Tours,https://www.lallytours.com/,Europe/London
+7778161,TFI Local Link Mayo,https://locallinkmayo.ie/,Europe/London
+7778162,TFI Local Link Kerry,https://www.locallinkkerry.ie/,Europe/London
+7778163,TFI Local Link Cork,https://www.locallinkcork.ie/,Europe/London
+7778164,TFI Local Link Galway,https://www.locallinkgalway.ie/,Europe/London
+7778165,TFI Local Link Longford Westmeath Roscommon,https://locallinklwr.ie/,Europe/London
+7778166,TFI Local Link Cavan Monaghan,https://www.locallinkcm.ie/,Europe/London
+7778167,TFI Local Link Tipperary,https://locallinktipperary.ie/,Europe/London
+7778168,TFI Local Link Waterford,https://www.locallinkwaterford.ie/,Europe/London
+7778169,TFI Local Link Wexford,https://locallinkwexford.ie/,Europe/London
+7778170,TFI Local Link Louth Meath Fingal,https://www.locallinklmf.ie/,Europe/London
+7778171,TFI Local Link Carlow Kilkenny Wicklow,https://www.ringalink.ie/,Europe/London
+7778172,TFI Local Link Laois Offaly,https://locallinklaoisoffaly.ie/,Europe/London
+7778173,TFI Local Link Limerick Clare,https://www.locallinklc.ie/,Europe/London
+7778174,TFI Local Link Donegal Sligo Leitrim,https://locallinkdsl.ie/,Europe/London
+7778189,Kilbride Coaches,https://kilbridecoaches.com/,Europe/London
+7778191,Doherty's Coach Travel,https://www.dohertyscoaches.com/,Europe/London
+7778193,Wexford Bus,https://www.wexfordbus.com/,Europe/London
+7778196,Matthews Coach Hire,https://www.matthews.ie/,Europe/London
+7778198,Mc Ginley Coach Travel,http://www.johnmcginley.com/,Europe/London
+7778206,Treacy Coaches,https://www.transportforireland.ie,Europe/London
+7778223,JJ/Bernard Kavanagh,https://jjkavanagh.ie/#,Europe/London
+7778225,Ashbourne Connect,https://www.ashbourneconnect.ie,Europe/London
+7778227,Martin Leydon Coaches,https://leydonscoaches.com/,Europe/London
+7778229,McConnon Travel,http://www.mcconnonsbuses.com/,Europe/London
+7778230,Joe Moroney Coach Hire Ltd,https://www.transportforireland.ie,Europe/London
+7778238,Gorey Coach & Bus Co. Ltd.,http://www.goreycoachandbus.com/,Europe/London
+7778239,Ardcavan Coach Tours,https://ardcavan.com/,Europe/London
+7778246,Michael Moran,https://www.transportforireland.ie,Europe/London
+7778247,Piltown Coaches,http://piltowncoaches.com/,Europe/London
+7778254,Slevins Coaches,http://slevinscoaches.com/,Europe/London
+7778255,Streamline Coaches,https://www.streamlinecoaches.ie/,Europe/London
+7778256,Barrett Travel,https://www.barrettcoaches.com/,Europe/London
+7778260,Eamon McEntee,https://mcenteecoachhire.ie/,Europe/London
+7778266,Seamus O'Reilly,https://www.transportforireland.ie,Europe/London
+7778268,Royal Breffni Tours Ltd,https://www.royalbreffnitours.com/,Europe/London
+7778269,TU Dublin Blancahrdstown,https://www.tudublin.ie/explore/our-campuses/blanchardstown/transportparking/,Europe/London
+7778270,Patrick Keenan,https://www.transportforireland.ie,Europe/London
+7778304,Eugene Deffely,https://www.transportforireland.ie,Europe/London
+7778309,Island Ferries Teoranta,https://www.aranislandferries.com/,Europe/London
+7778312,TFI Local Link Kildare South Dublin,https://locallinkkildaresouthdublin.ie/,Europe/London
+7778347,Francis Finegan Coach Hire,https://www.transportforireland.ie,Europe/London
+7778348,Walsh's Executive Travel,https://www.transportforireland.ie,Europe/London
+7778352,Nolan Coaches,https://www.nolancoaches.ie/,Europe/London
+7778363,Allen's Bus Hire,https://allensbushire.ie/,Europe/London
+7778371,MCD Minibus Hire,https://www.transportforireland.ie,Europe/London
+7778481,Pat Naughton Roscommon Coaches Ltd.,https://roscommoncoaches.ie/,Europe/London
