@@ -1,6 +1,5 @@
 # ignore everything by default
 /*
-
 # allow these top-level items
 !.gitignore
 !requirements.txt
@@ -16,6 +15,7 @@
 !notebooks
 !/gtfs_static/census/
 !data_hist/*/norms/
+!.gitattributes
 # optional: macOS & editor artifacts
 .DS_Store
 *.code-workspace
