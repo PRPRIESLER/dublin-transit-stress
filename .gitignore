@@ -14,6 +14,8 @@
 !join_daily.py
 !join_minute_with_weather.py
 !notebooks
+!/gtfs_static/census/
+#!data_hist/
 # optional: macOS & editor artifacts
 .DS_Store
 *.code-workspace
