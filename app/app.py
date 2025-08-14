@@ -46,25 +46,6 @@ st.set_page_config(
     layout="wide",
 )
 
-# ── FIX: Sidebar jumps in Hugging Face (iframe) ─────────────────
-SIDEBAR_CSS = """
-<style>
-/* Keep the sidebar stuck to the top and independently scrollable */
-section[data-testid="stSidebar"] > div {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-}
-
-/* HF’s container sometimes clips scrolling; relax overflow */
-[data-testid="stAppViewContainer"] {
-  overflow: visible !important;
-}
-</style>
-"""
-st.markdown(SIDEBAR_CSS, unsafe_allow_html=True)
-
 # ─── Title bar ──────────────────────────────────────────────────
 st.title("Dublin Transit Stress Analysis")
 st.caption("Exploring speed, delay, weather and vanishing trips across Dublin’s bus network")
