@@ -46,6 +46,25 @@ st.set_page_config(
     layout="wide",
 )
 
+# ── FIX: Sidebar jumps in Hugging Face (iframe) ─────────────────
+SIDEBAR_CSS = """
+<style>
+/* Keep the sidebar stuck to the top and independently scrollable */
+section[data-testid="stSidebar"] > div {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* HF’s container sometimes clips scrolling; relax overflow */
+[data-testid="stAppViewContainer"] {
+  overflow: visible !important;
+}
+</style>
+"""
+st.markdown(SIDEBAR_CSS, unsafe_allow_html=True)
+
 # ─── Title bar ──────────────────────────────────────────────────
 st.title("Dublin Transit Stress Analysis")
 st.caption("Exploring speed, delay, weather and vanishing trips across Dublin’s bus network")
@@ -577,7 +596,7 @@ delta_cnt  = k["anchors"] - count_mu
 
 cA, cB, cC, cD, cE = st.columns(5)
 cA.metric("Vanished transits", f"{k['anchors']:,}", delta=f"{delta_cnt:+.0f} vs 7-day avg")
-cB.metric("Vanish rate / 1k min", f"{k['rate']:.2f}", delta=f"{delta_rate:+.2f} vs 7-day avg")
+cB.metric("Vanish rate / 1k min", f"{k['rate']:.2f}", delta=f"{delta_rate:+.2f} vs 7-day avg",help="Number of vanish events per 1,000 in-service vehicle-minutes. For example, a rate of 0.5 means 1 vanish for every ~2,000 minutes of service.")
 cC.metric("Worst hour", f"{k['worst_hour']:02d}:00" if k["worst_hour"] is not None else "—")
 cD.metric("7-day avg rate", f"{rate_mu:.2f}")
 cE.metric("7-day avg count", f"{count_mu:.0f}")
