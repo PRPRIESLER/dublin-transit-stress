@@ -791,3 +791,4 @@ with st.expander("📘 Methodology & Glossary", expanded=False):
 """)
 
 st.caption(f"Data day: **{date_sel}** • Updated nightly")
+st.caption(f"Developed By - © Pinaki Pani")
