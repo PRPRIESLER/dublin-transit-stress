@@ -1,5 +1,6 @@
 # ────────────────────────────────────────────────────────────────
 # Dublin Transit Stress Analysis – Deploy-ready Streamlit app
+# (Lazy-loaded sections: only the active tab's code runs)
 # ────────────────────────────────────────────────────────────────
 
 # ❶ Make package import work from anywhere
@@ -12,7 +13,7 @@ import streamlit as st
 import pandas as pd
 import pydeck as pdk
 import altair as alt
-import os, time
+import os
 from pathlib import Path
 
 # corridor helpers
@@ -385,11 +386,11 @@ def stress_rgb(s: float):
     return              [120,  0, 0, 255]
 
 # ───── Sidebar filters (for Stress map + leaderboards) ──────────
-map_mode = st.sidebar.radio("🗺️ Map view", ["Dots", "Aggregate", "Corridors"], key="map_mode")
+st.sidebar.title("🚦 Stress Filters")
 dates_all = list_dates()
 date_sel = st.sidebar.selectbox("📅 Select date", dates_all, index=len(dates_all)-1, key="date_sel")
+map_mode = st.sidebar.radio("🗺️ Map view", ["Dots", "Aggregate", "Corridors"], key="map_mode")
 
-st.sidebar.title("🚦 Stress filters")
 thr      = st.sidebar.slider("Stress threshold", 0.3, 1.0, 0.5, 0.05, key="thr_main")
 hr_from, hr_to = st.sidebar.slider("Hour range", 0, 23, (0, 23), key="hr_range")
 
@@ -400,21 +401,9 @@ if anim_hr is not None:
 else:
     anim_min = None
 
-df         = load_scored(date_sel)
-df         = df.merge(load_routes(), on="route_id", how="left")
-trips_lu   = load_trips()
-shapes_df  = load_shapes()
-
-route_opts = sorted(df["display_name"].dropna().unique())
-route_pick = st.sidebar.multiselect("🚌 Select route(s)", route_opts, key="route_pick")
-dir_pick   = st.sidebar.multiselect("Direction",
-                                    sorted(df["direction_id"].unique().astype(int)),
-                                    default=sorted(df["direction_id"].unique().astype(int)),
-                                    key="dir_pick")
 flag_van   = st.sidebar.checkbox("🚩 Vanished only", key="flag_van")
-#flag_stuck = st.sidebar.checkbox("🛑 Stuck only (speed<2 kph & delay>5 m)", key="flag_stuck")
 
-# >>> VANISH DOTS EXTRAS (from dash8): special controls only when Dots + Vanished only
+# >>> VANISH DOTS EXTRAS (from dash8): only when Dots + Vanished only
 show_last_minute    = False
 ignore_thr_for_last = False
 if flag_van and map_mode == "Dots":
@@ -432,330 +421,444 @@ if flag_van and map_mode == "Dots":
 # <<< end extras
 
 # ────────────────────────────────────────────────────────────────
-# SECTION 1 — TRANSIT STRESS
+# “Tabs” as a horizontal radio — lazy loads only the active section
 # ────────────────────────────────────────────────────────────────
-section_header("Transit Stress", """
+st.markdown("""
+<style>
+/* container */
+div[role="radiogroup"][aria-label="Sections"] {
+  display:flex;
+  gap:8px;
+  border-bottom:2px solid #d1d5db;
+  padding-bottom:6px;
+  margin-bottom:12px;
+}
+
+/* hide the default radio dots */
+div[role="radiogroup"][aria-label="Sections"] > label > div:first-child{
+  display:none !important;
+}
+
+/* each tab */
+div[role="radiogroup"][aria-label="Sections"] > label {
+  padding:8px 18px;
+  border:1px solid #cbd5e1;
+  border-radius:8px 8px 0 0;
+  background:#f3f4f6;
+  color:#374151;
+  cursor:pointer;
+  transition:background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+/* hover */
+div[role="radiogroup"][aria-label="Sections"] > label:hover {
+  background:#e5e7eb;
+  border-color:#9ca3af;
+}
+
+/* active/selected tab */
+div[role="radiogroup"][aria-label="Sections"] > label[data-checked="true"] {
+  background:#ffffff !important;
+  color:#111827 !important;
+  font-weight:700;
+  border-color:#2563eb;                /* blue border accent */
+  border-bottom:2px solid #ffffff;     /* fuse with content area */
+  box-shadow:0 -2px 5px rgba(0,0,0,0.05);
+}
+
+/* larger label text */
+div[role="radiogroup"][aria-label="Sections"] > label div[data-testid="stMarkdownContainer"] {
+  font-size:1.06rem;
+  line-height:1.4;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+tab_choice = st.radio(
+    "Sections",
+    ["🚦 Stress", "🚩 Vanished", "🗺️ Citywide"],
+    horizontal=True,
+    label_visibility="collapsed",
+    key="active_section",
+)
+
+# ────────────────────────────────────────────────────────────────
+# SECTION 1 — TRANSIT STRESS (lazy-loaded)
+# ────────────────────────────────────────────────────────────────
+if tab_choice == "🚦 Stress":
+    section_header("Transit Stress", """
 The **stress score (0–1)** blends delay, speed, heat and vanish risk (weighted).  
 Below: trend of the **share of vehicle-minutes above a chosen threshold**.
 Leaderboards.
 Stress Map (The filters on the Left are for this Map only!).
 """)
 
-# Scoreboard (with human-readable axes)
-left, right = st.columns([6, 2])
-with right:
-    metric_thr = st.selectbox("Stress threshold for metric",
-                              [round(x,2) for x in (0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90)],
-                              index=4, key="sb_metric_thr")
-with left:
-    st.subheader("Performance scoreboard")
-    st.altair_chart(
-        alt.Chart(daily_trend(metric_thr))
-        .mark_line(point=True)
-        .encode(
-            x=alt.X("day:N", title="Day"),
-            y=alt.Y("share:Q", title="% of minutes > threshold", axis=alt.Axis(format="%")),
-            tooltip=[alt.Tooltip("date:T", title="Date"),
-                     alt.Tooltip("share:Q", title="Above-threshold", format=".1%")]
-        )
-        .properties(height=240),
-        use_container_width=True
+    # Load only for this section
+    df         = load_scored(date_sel)
+    df         = df.merge(load_routes(), on="route_id", how="left")
+    trips_lu   = load_trips()
+    shapes_df  = load_shapes()
+    route_opts = sorted(df["display_name"].dropna().unique())
+    # Put route picker here (stress-only) to avoid sidebar cost in other tabs
+    route_pick = st.sidebar.multiselect("🚌 Select route(s)", route_opts, key="route_pick")
+    dir_pick   = st.sidebar.multiselect(
+        "Direction",
+        sorted(df["direction_id"].unique().astype(int)),
+        default=sorted(df["direction_id"].unique().astype(int)),
+        key="dir_pick",
     )
 
-# Filters → df_view
-mask = df["hour"].between(hr_from, hr_to)
-if anim_hr is not None:
-    mask &= (df["hour"] == anim_hr) & (df["minute"] == anim_min)
-if route_pick: mask &= df["display_name"].isin(route_pick)
-if dir_pick:   mask &= df["direction_id"].isin(dir_pick)
+    # Scoreboard (with human-readable axes)
+    left, right = st.columns([6, 2])
+    with right:
+        metric_thr = st.selectbox("Stress threshold for metric",
+                                  [round(x,2) for x in (0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90)],
+                                  index=4, key="sb_metric_thr")
+    with left:
+        st.subheader("Performance scoreboard")
+        trend_df = daily_trend(metric_thr)
+        st.altair_chart(
+            alt.Chart(trend_df)
+            .mark_line(point=True)
+            .encode(
+                x=alt.X("day:N", title="Day"),
+                y=alt.Y("share:Q", title="% of minutes > threshold", axis=alt.Axis(format="%")),
+                tooltip=[alt.Tooltip("date:T", title="Date"),
+                         alt.Tooltip("share:Q", title="Above-threshold", format=".3%")]
+            )
+            .properties(height=240),
+            use_container_width=True
+        )
 
-if flag_van:
-    if map_mode == "Dots" and show_last_minute:
-        mask &= df.get("vanish_anchor", False)
-        if not ignore_thr_for_last:
+        # One-line headline (selected date vs prior day)
+        headline = None
+        if not trend_df.empty:
+            target = pd.to_datetime(date_sel)
+            cur_row = trend_df.loc[trend_df["date"] == target]
+            if not cur_row.empty:
+                cur = float(cur_row["share"].iloc[0])
+                prev_row = trend_df.loc[trend_df["date"] < target].tail(1)
+            else:
+                cur = float(trend_df["share"].iloc[-1])
+                prev_row = trend_df.tail(2).head(1)
+            if prev_row.empty:
+                headline = f"Latest: **{cur:.2%}**."
+            else:
+                prev = float(prev_row["share"].iloc[0])
+                delta_pp = (cur - prev) * 100
+                headline = f"Latest: **{cur:.2%}** ({delta_pp:+.2f} pp vs prior day)"
+        if headline:
+            st.caption(headline)
+
+    # Filters → df_view
+    mask = df["hour"].between(hr_from, hr_to)
+    if anim_hr is not None:
+        mask &= (df["hour"] == anim_hr) & (df["minute"] == anim_min)
+    if route_pick: mask &= df["display_name"].isin(route_pick)
+    if dir_pick:   mask &= df["direction_id"].isin(dir_pick)
+
+    if flag_van:
+        if map_mode == "Dots" and show_last_minute:
+            mask &= df.get("vanish_anchor", False)
+            if not ignore_thr_for_last:
+                mask &= df["row_stress"] >= thr
+        else:
+            mask &= df.get("vanished", False)
             mask &= df["row_stress"] >= thr
     else:
-        mask &= df.get("vanished", False)
         mask &= df["row_stress"] >= thr
-else:
-    mask &= df["row_stress"] >= thr
 
-df_view = df[mask]
+    df_view = df[mask]
 
-st.subheader(f"Showing {len(df_view):,} vehicle-minutes")
-subL, subR = st.columns(2)
-with subL:
-    st.markdown("#### 🥇 Worst routes – *average* stress")
-    lb_avg = (df_view.groupby("display_name")["row_stress"].mean()
-                .round(3).reset_index(name="avg")
-                .nlargest(10, "avg").rename(columns={"display_name":"route"}))
-    st.dataframe(lb_avg, use_container_width=True, height=310)
-with subR:
-    st.markdown("#### 🔺 Worst routes – *maximum* stress")
-    lb_max = (df_view.groupby("display_name")["row_stress"].max()
-                .round(3).reset_index(name="max")
-                .nlargest(10, "max").rename(columns={"display_name":"route"}))
-    st.dataframe(lb_max, use_container_width=True, height=310)
+    st.subheader(f"Showing {len(df_view):,} vehicle-minutes")
+    subL, subR = st.columns(2)
+    with subL:
+        st.markdown("#### 🥇 Worst routes – *average* stress")
+        lb_avg = (df_view.groupby("display_name")["row_stress"].mean()
+                    .round(3).reset_index(name="avg")
+                    .nlargest(10, "avg").rename(columns={"display_name":"route"}))
+        st.dataframe(lb_avg, use_container_width=True, height=310)
+    with subR:
+        st.markdown("#### 🔺 Worst routes – *maximum* stress")
+        lb_max = (df_view.groupby("display_name")["row_stress"].max()
+                    .round(3).reset_index(name="max")
+                    .nlargest(10, "max").rename(columns={"display_name":"route"}))
+        st.dataframe(lb_max, use_container_width=True, height=310)
 
-# Map
-layers, tooltip = [], None
-if map_mode == "Dots":
-    dots = df_view.copy()
-    dots["color"]  = dots["row_stress"].apply(stress_rgb)
-    dots["radius"] = 150
-    layers.append(pdk.Layer("ScatterplotLayer",
-                            data=dots,
-                            get_position='[lon, lat]',
-                            get_fill_color='color',
-                            get_radius='radius',
-                            radius_scale=1,
-                            pickable=True))
-    tooltip = {"html": (
-        "<b>{display_name}</b><br/>Trip {trip_id}<br/>Vehicle {vehicle_id}"
-        "<br/>Stress {row_stress}<br/>Delay {delay_sec} s"
-        "<br/>Speed {speed_kph} kph"
-        "<br/>{datetime_str}")}
+    # micro-badges showing current filters
+    def chip(text):
+        return f"<span style='background:#1f2937;border:1px solid #374151;padding:4px 10px;border-radius:999px;margin-right:8px;font-size:0.9rem'>{text}</span>"
+    rp_txt = "All" if not route_pick else (", ".join(route_pick[:3]) + (f" +{len(route_pick)-3}" if len(route_pick) > 3 else ""))
+    badges_html = "".join([
+        chip(f"Date: {date_sel}"),
+        chip(f"Hours: {hr_from:02d}–{hr_to:02d}"),
+        chip(f"Routes: {rp_txt}"),
+        chip(f"Threshold: {thr:.2f}"),
+        chip(f"Map: {map_mode}")
+    ])
+    st.markdown(badges_html, unsafe_allow_html=True)
 
-elif map_mode == "Corridors":
-    seg_df = corridor_stats_filtered(df_view, thr).nlargest(10000, "avg_stress")
-    seg_df["path"]  = seg_df["geometry"].apply(lambda g: list(map(list, g.coords)))
-    seg_df["color"] = seg_df["avg_stress"].apply(lambda s: stress_rgb(s)[:3])
-    seg_df          = seg_df.drop(columns="geometry")
-    layers.append(pdk.Layer("PathLayer",
-                            data=seg_df,
-                            get_path="path",
-                            get_color="color",
-                            width_units="pixels",
-                            get_width=4,
-                            opacity=0.7,
-                            width_min_pixels=6,
-                            pickable=True))
-    tooltip = {"html": "<b>Avg stress:</b> {avg_stress}"}
+    # Map
+    layers, tooltip = [], None
+    if map_mode == "Dots":
+        dots = df_view.copy()
+        dots["color"]  = dots["row_stress"].apply(stress_rgb)
+        dots["radius"] = 150
+        layers.append(pdk.Layer("ScatterplotLayer",
+                                data=dots,
+                                get_position='[lon, lat]',
+                                get_fill_color='color',
+                                get_radius='radius',
+                                radius_scale=1,
+                                pickable=True))
+        tooltip = {"html": (
+            "<b>{display_name}</b><br/>Trip {trip_id}<br/>Vehicle {vehicle_id}"
+            "<br/>Stress {row_stress}<br/>Delay {delay_sec} s"
+            "<br/>Speed {speed_kph} kph"
+            "<br/>{datetime_str}")}
 
-else:  # Aggregate by shape
-    agg = (df_view.groupby(["route_id","direction_id"])
-                  .agg(avg=("row_stress","mean")).reset_index())
-    rep_trip = (df_view[["route_id","direction_id","trip_id"]]
-                .drop_duplicates()
-                .groupby(["route_id","direction_id"]).first().reset_index())
-    agg = (agg.merge(rep_trip,on=["route_id","direction_id"],how="left")
-              .merge(trips_lu,on="trip_id",how="left")
-              .merge(shapes_df,on="shape_id",how="left")
-              .sort_values("seq"))
-    for (_,_,sid), g in agg.groupby(["route_id","direction_id","shape_id"]):
-        pts = g[["lon","lat"]].dropna().values.tolist()
-        if len(pts) < 2: continue
+    elif map_mode == "Corridors":
+        seg_df = corridor_stats_filtered(df_view, thr).nlargest(10000, "avg_stress")
+        seg_df["path"]  = seg_df["geometry"].apply(lambda g: list(map(list, g.coords)))
+        seg_df["color"] = seg_df["avg_stress"].apply(lambda s: stress_rgb(s)[:3])
+        seg_df          = seg_df.drop(columns="geometry")
         layers.append(pdk.Layer("PathLayer",
-                                data=pd.DataFrame({"path":[pts]}),
+                                data=seg_df,
                                 get_path="path",
-                                get_color=stress_rgb(g["avg"].iloc[0])[:3],
+                                get_color="color",
                                 width_units="pixels",
                                 get_width=4,
-                                opacity=0.7))
+                                opacity=0.7,
+                                width_min_pixels=6,
+                                pickable=True))
+        tooltip = {"html": "<b>Avg stress:</b> {avg_stress}"}
 
-st.pydeck_chart(pdk.Deck(
-    map_style="mapbox://styles/mapbox/streets-v11",
-    initial_view_state=pdk.ViewState(latitude=53.35, longitude=-6.26, zoom=10.5),
-    layers=layers,
-    tooltip=tooltip
-))
+    else:  # Aggregate by shape
+        agg = (df_view.groupby(["route_id","direction_id"])
+                      .agg(avg=("row_stress","mean")).reset_index())
+        rep_trip = (df_view[["route_id","direction_id","trip_id"]]
+                    .drop_duplicates()
+                    .groupby(["route_id","direction_id"]).first().reset_index())
+        agg = (agg.merge(rep_trip,on=["route_id","direction_id"],how="left")
+                  .merge(load_trips(),on="trip_id",how="left")
+                  .merge(load_shapes(),on="shape_id",how="left")
+                  .sort_values("seq"))
+        for (_,_,sid), g in agg.groupby(["route_id","direction_id","shape_id"]):
+            pts = g[["lon","lat"]].dropna().values.tolist()
+            if len(pts) < 2: continue
+            layers.append(pdk.Layer("PathLayer",
+                                    data=pd.DataFrame({"path":[pts]}),
+                                    get_path="path",
+                                    get_color=stress_rgb(g["avg"].iloc[0])[:3],
+                                    width_units="pixels",
+                                    get_width=4,
+                                    opacity=0.7))
+
+    st.pydeck_chart(pdk.Deck(
+        map_style="mapbox://styles/mapbox/streets-v11",
+        initial_view_state=pdk.ViewState(latitude=53.35, longitude=-6.26, zoom=10.5),
+        layers=layers,
+        tooltip=tooltip
+    ))
 
 # ────────────────────────────────────────────────────────────────
-# SECTION 2 — VANISHED TRANSIT
+# SECTION 2 — VANISHED TRANSIT (lazy-loaded)
 # ────────────────────────────────────────────────────────────────
-section_header("Vanished Transit", """
+elif tab_choice == "🚩 Vanished":
+    section_header("Vanished Transit", """
 A **vanished trip** = vehicle goes silent ≥30 min **before scheduled end**  
 (ignoring the final 2 min near terminus). Rate shown per 1,000 vehicle-minutes.
 """)
 
-k    = vanish_kpis_today(date_sel)
-base = vanish_baseline(7)
-rate_mu    = float(base["rate"].mean()) if not base.empty else 0.0
-count_mu   = float(base["anchors"].mean()) if not base.empty else 0.0
-delta_rate = k["rate"] - rate_mu
-delta_cnt  = k["anchors"] - count_mu
+    k    = vanish_kpis_today(date_sel)
+    base = vanish_baseline(7)
+    rate_mu    = float(base["rate"].mean()) if not base.empty else 0.0
+    count_mu   = float(base["anchors"].mean()) if not base.empty else 0.0
+    delta_rate = k["rate"] - rate_mu
+    delta_cnt  = k["anchors"] - count_mu
 
-cA, cB, cC, cD, cE = st.columns(5)
-cA.metric("Vanished transits", f"{k['anchors']:,}", delta=f"{delta_cnt:+.0f} vs 7-day avg")
-cB.metric("Vanish rate / 1k min", f"{k['rate']:.2f}", delta=f"{delta_rate:+.2f} vs 7-day avg",help="Number of vanish events per 1,000 in-service vehicle-minutes. For example, a rate of 0.5 means 1 vanish for every ~2,000 minutes of service.")
-cC.metric("Worst hour", f"{k['worst_hour']:02d}:00" if k["worst_hour"] is not None else "—")
-cD.metric("7-day avg rate", f"{rate_mu:.2f}")
-cE.metric("7-day avg count", f"{count_mu:.0f}")
+    cA, cB, cC, cD, cE = st.columns(5)
+    cA.metric("Vanished transits", f"{k['anchors']:,}", delta=f"{delta_cnt:+.0f} vs 7-day avg")
+    cB.metric("Vanish rate / 1k min", f"{k['rate']:.2f}", delta=f"{delta_rate:+.2f} vs 7-day avg",
+              help="Number of vanish events per 1,000 in-service vehicle-minutes. For example, a rate of 0.5 means 1 vanish for every ~2,000 minutes of service.")
+    cC.metric("Worst hour", f"{k['worst_hour']:02d}:00" if k["worst_hour"] is not None else "—")
+    cD.metric("7-day avg rate", f"{rate_mu:.2f}")
+    cE.metric("7-day avg count", f"{count_mu:.0f}")
 
-st.markdown("#### Vanish heatmap (last 7 days)")
-hm = vanish_heatmap_last7()
-if hm.empty:
-    st.info("No vanish anchors found in the last 7 days.")
-else:
-    heat = (alt.Chart(hm)
-              .mark_rect()
-              .encode(
-                  x=alt.X("hour:O", title="Hour of day"),
-                  y=alt.Y("weekday:N", title=None,
-                          sort=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]),
-                  color=alt.Color("count:Q", title="Vanished", scale=alt.Scale(scheme="inferno")),
-                  tooltip=["weekday:N","hour:O","count:Q"]
-              ).properties(height=240))
-    st.altair_chart(heat, use_container_width=True)
-
-# TTV block
-st.markdown("#### Time-to-vanish (minutes from trip start to vanish)")
-scope = st.radio("Scope", ["Selected Date", "Last 7 days"], horizontal=True, key="ttv_scope")
-if scope == "Selected Date":
-    ttv = ttv_minutes((date_sel,))
-else:
-    days7 = tuple(list_dates()[-7:])
-    ttv = ttv_minutes(days7)
-
-if ttv.empty:
-    st.info("No vanished trips in the selected scope.")
-else:
-    med = float(ttv["mins"].median())
-    p25 = float(ttv["mins"].quantile(0.25))
-    p75 = float(ttv["mins"].quantile(0.75))
-    early = (ttv["mins"] <= 2).mean()*100
-    late  = (ttv["mins"] > 30).mean()*100
-
-    left_col, right_col = st.columns([3, 2])
-
-    with left_col:
-        k1,k2,k3,k4 = st.columns(4)
-        k1.metric("Vanished trips", f"{len(ttv):,}")
-        k2.metric("Median minutes", f"{med:.1f}", f"P25 {p25:.1f} / P75 {p75:.1f}")
-        k3.metric("≤ 2 minutes", f"{early:.1f}%")
-        k4.metric("&gt; 30 minutes", f"{late:.1f}%")
-
-        hist = (alt.Chart(ttv[ttv["mins"] <= 120])
-                  .mark_bar()
+    st.markdown("#### Vanish heatmap (last 7 days)")
+    hm = vanish_heatmap_last7()
+    if hm.empty:
+        st.info("No vanish anchors found in the last 7 days.")
+    else:
+        heat = (alt.Chart(hm)
+                  .mark_rect()
                   .encode(
-                      x=alt.X("mins:Q", bin=alt.Bin(step=2),
-                              title="Minutes from first observed minute to vanish"),
-                      y=alt.Y("count():Q", title="Vanished trips (count)"),
-                      tooltip=[alt.Tooltip("count():Q", title="trips")]
-                  ).properties(height=230))
-        rule = alt.Chart(pd.DataFrame({"m":[med]})).mark_rule(color="red").encode(x="m:Q")
-        st.altair_chart(hist + rule, use_container_width=True)
+                      x=alt.X("hour:O", title="Hour of day"),
+                      y=alt.Y("weekday:N", title=None,
+                              sort=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]),
+                      color=alt.Color("count:Q", title="Vanished", scale=alt.Scale(scheme="inferno")),
+                      tooltip=["weekday:N","hour:O","count:Q"]
+                  ).properties(height=240))
+        st.altair_chart(heat, use_container_width=True)
 
-    with right_col:
-        routes = load_routes()
-        ttv_routes = (ttv.merge(routes, on="route_id", how="left")
-                        .groupby("display_name")
-                        .size()
-                        .reset_index(name="trips")
-                        .sort_values("trips", ascending=False)
-                        .head(10)
-                        .rename(columns={"display_name":"route"}))
-        st.markdown("**Top routes by vanished trips (scope)**")
-        st.dataframe(ttv_routes[["route","trips"]],
-                     use_container_width=True, height=330)
+    # TTV block
+    st.markdown("#### Time-to-vanish (minutes from trip start to vanish)")
+    scope = st.radio("Scope", ["Selected Date", "Last 7 days"], horizontal=True, key="ttv_scope")
+    if scope == "Selected Date":
+        ttv = ttv_minutes((date_sel,))
+    else:
+        days7 = tuple(list_dates()[-7:])
+        ttv = ttv_minutes(days7)
+
+    if ttv.empty:
+        st.info("No vanished trips in the selected scope.")
+    else:
+        med = float(ttv["mins"].median())
+        p25 = float(ttv["mins"].quantile(0.25))
+        p75 = float(ttv["mins"].quantile(0.75))
+        early = (ttv["mins"] <= 2).mean()*100
+        late  = (ttv["mins"] > 30).mean()*100
+
+        left_col, right_col = st.columns([3, 2])
+
+        with left_col:
+            k1,k2,k3,k4 = st.columns(4)
+            k1.metric("Vanished trips", f"{len(ttv):,}")
+            k2.metric("Median minutes", f"{med:.1f}", f"P25 {p25:.1f} / P75 {p75:.1f}")
+            k3.metric("≤ 2 minutes", f"{early:.1f}%")
+            k4.metric("&gt; 30 minutes", f"{late:.1f}%")
+
+            hist = (alt.Chart(ttv[ttv["mins"] <= 120])
+                      .mark_bar()
+                      .encode(
+                          x=alt.X("mins:Q", bin=alt.Bin(step=2),
+                                  title="Minutes from first observed minute to vanish"),
+                          y=alt.Y("count():Q", title="Vanished trips (count)"),
+                          tooltip=[alt.Tooltip("count():Q", title="trips")]
+                      ).properties(height=230))
+            rule = alt.Chart(pd.DataFrame({"m":[med]})).mark_rule(color="red").encode(x="m:Q")
+            st.altair_chart(hist + rule, use_container_width=True)
+
+        with right_col:
+            routes = load_routes()
+            ttv_routes = (ttv.merge(routes, on="route_id", how="left")
+                            .groupby("display_name")
+                            .size()
+                            .reset_index(name="trips")
+                            .sort_values("trips", ascending=False)
+                            .head(10)
+                            .rename(columns={"display_name":"route"}))
+            st.markdown("**Top routes by vanished trips (scope)**")
+            st.dataframe(ttv_routes[["route","trips"]],
+                         use_container_width=True, height=330)
 
 # ────────────────────────────────────────────────────────────────
-# SECTION 3 — CITYWIDE DISTRIBUTION (ED polygons)
+# SECTION 3 — CITYWIDE DISTRIBUTION (ED polygons, lazy-loaded)
 # ────────────────────────────────────────────────────────────────
-section_header("Citywide Distribution (Census Boundary Polygons)", """
+elif tab_choice == "🗺️ Citywide":
+    section_header("Citywide Distribution (Census Boundary Polygons)", """
 **Left:** ED stress aggregation (Avg / Max / %>threshold).  
 For **%>threshold**, polygons with **no above-threshold minutes** are muted green/gray; others use a red ramp scaled by the city’s 95th percentile **count** of above-threshold minutes.  
 **Right:** unique vanished-trip counts per ED. This block ignores the sidebar filters; choose *Selected Date* vs *Last 7 days* below.
 """)
 
-if not GEO_OK:
-    st.info("ED view requires GeoPandas/Shapely. Install with: `pip install geopandas shapely`")
-else:
-    ed_scope = st.radio("Scope", ["Selected Date", "Last 7 days"], horizontal=True, key="ed_scope")
-    days_for_maps = (date_sel,) if ed_scope == "Selected Date" else tuple(list_dates()[-7:])
+    if not GEO_OK:
+        st.info("ED view requires GeoPandas/Shapely. Install with: `pip install geopandas shapely`")
+    else:
+        ed_scope = st.radio("Scope", ["Selected Date", "Last 7 days"], horizontal=True, key="ed_scope")
+        days_for_maps = (date_sel,) if ed_scope == "Selected Date" else tuple(list_dates()[-7:])
 
-    
+        left_col, right_col = st.columns(2)
 
-    left_col, right_col = st.columns(2)
-
-    # LEFT: stress polygons
-    with left_col:
-        st.markdown("**Stress (Avg / Max / %>threshold)**")
-        ed_metric = st.radio("Metric", ["Max", "Avg", "%>threshold"], horizontal=True, key="ed_metric_left")
-        ed_thr = None
-        if ed_metric == "%>threshold":
-            ed_thr = st.selectbox("Threshold", [0.30,0.40,0.50,0.60,0.70,0.80,0.90], index=2, key="ed_thr_left")
-
-        st.caption("Citywide stress (ED polygons)")
-        gdf_stress = ed_stress_agg(days_for_maps, ed_metric, ed_thr)
-        if gdf_stress is None:
-            st.info("Could not load ED polygons.")
-        else:
-            gdf = gdf_stress.explode(index_parts=False).reset_index(drop=True)
-
-            def to_ring(geom):
-                try:    return [list(x) for x in geom.exterior.coords]
-                except: return None
-
-            gdf["polygon"] = gdf.geometry.apply(to_ring)
-            gdf = gdf.dropna(subset=["polygon"])
-
+        # LEFT: stress polygons
+        with left_col:
+            st.markdown("**Stress (Avg / Max / %>threshold)**")
+            ed_metric = st.radio("Metric", ["Max", "Avg", "%>threshold"], horizontal=True, key="ed_metric_left")
+            ed_thr = None
             if ed_metric == "%>threshold":
-                q95 = max(1.0, float(gdf["count_hi"].quantile(0.95))) if not gdf.empty else 1.0
-                def color_from_count(c):
-                    if c <= 0:
-                        return [180, 210, 180, 140]     # muted green/grey for zero
-                    x = min(float(c)/q95, 1.0)
-                    return stress_rgb(0.3 + 0.7*x)
-                gdf["color"] = gdf["count_hi"].apply(color_from_count)
-                tip = {"html": "<b>{ed_name}</b><br/>Above-thr minutes: {count_hi}<br/>All minutes: {n}<br/>Share: {share_hi}"}
-                legend = "Legend: grey/green = none; deeper red = more above-threshold minutes (scaled to city’s 95th %ile)."
+                ed_thr = st.selectbox("Threshold", [0.30,0.40,0.50,0.60,0.70,0.80,0.90], index=2, key="ed_thr_left")
+
+            st.caption("Citywide stress (ED polygons)")
+            gdf_stress = ed_stress_agg(days_for_maps, ed_metric, ed_thr)
+            if gdf_stress is None:
+                st.info("Could not load ED polygons.")
             else:
-                gdf["color"] = gdf["value"].apply(lambda v: stress_rgb(float(v)))
-                tip = {"html": "<b>{ed_name}</b><br/>Value: {value}<br/>Minutes: {n}"}
-                legend = "Legend: greener = lower stress; deeper red = higher."
+                gdf = gdf_stress.explode(index_parts=False).reset_index(drop=True)
 
-            layer = pdk.Layer(
-                "PolygonLayer",
-                data=gdf,
-                get_polygon="polygon",
-                get_fill_color="color",
-                get_line_color=[60,60,60],
-                line_width_min_pixels=1,
-                pickable=True, stroked=True, opacity=0.6
-            )
-            st.pydeck_chart(pdk.Deck(
-                map_style="mapbox://styles/mapbox/streets-v11",
-                initial_view_state=pdk.ViewState(latitude=53.35, longitude=-6.26, zoom=10.5),
-                layers=[layer], tooltip=tip))
-            st.caption(legend)
-            st.download_button("Download ED stress CSV",
-                               gdf_stress.drop(columns="geometry").to_csv(index=False).encode("utf-8"),
-                               file_name=f"ed_stress_{ed_metric}_{ed_scope}_{date_sel}.csv",
-                               mime="text/csv")
+                def to_ring(geom):
+                    try:    return [list(x) for x in geom.exterior.coords]
+                    except: return None
 
-    # RIGHT: vanished counts polygons
-    with right_col:
-        st.markdown("**Vanished trips — count**")
-        space_px = 84 if ed_metric != "%>threshold" else 168
-        st.markdown(f"<div style='height:{space_px}px'></div>", unsafe_allow_html=True)
-        st.caption("Citywide vanish counts")
-        gdf_vanish = ed_vanish_counts(days_for_maps)
-        if gdf_vanish is None:
-            st.info("Could not load ED polygons.")
-        else:
-            draw = gdf_vanish.explode(index_parts=False).reset_index(drop=True)
+                gdf["polygon"] = gdf.geometry.apply(to_ring)
+                gdf = gdf.dropna(subset=["polygon"])
 
-            def to_ring(geom):
-                try:    return [list(x) for x in geom.exterior.coords]
-                except: return None
+                if ed_metric == "%>threshold":
+                    q95 = max(1.0, float(gdf["count_hi"].quantile(0.95))) if not gdf.empty else 1.0
+                    def color_from_count(c):
+                        if c <= 0:
+                            return [180, 210, 180, 140]     # muted green/grey for zero
+                        x = min(float(c)/q95, 1.0)
+                        return stress_rgb(0.3 + 0.7*x)
+                    gdf["color"] = gdf["count_hi"].apply(color_from_count)
+                    tip = {"html": "<b>{ed_name}</b><br/>Above-thr minutes: {count_hi}<br/>All minutes: {n}<br/>Share: {share_hi}"}
+                    legend = "Legend: grey/green = none; deeper red = more above-threshold minutes (scaled to city’s 95th %ile)."
+                else:
+                    gdf["color"] = gdf["value"].apply(lambda v: stress_rgb(float(v)))
+                    tip = {"html": "<b>{ed_name}</b><br/>Value: {value}<br/>Minutes: {n}"}
+                    legend = "Legend: greener = lower stress; deeper red = higher."
 
-            draw["polygon"] = draw.geometry.apply(to_ring)
-            draw = draw.dropna(subset=["polygon"])
-            q95 = max(1, float(draw["vanish_count"].quantile(0.95))) if not draw.empty else 1.0
-            draw["color"] = draw["vanish_count"].apply(lambda c: stress_rgb(0.3 + 0.7*min(float(c)/q95, 1.0)))
-            layer = pdk.Layer("PolygonLayer", data=draw, get_polygon="polygon",
-                              get_fill_color="color", get_line_color=[60,60,60],
-                              line_width_min_pixels=1, pickable=True, stroked=True, opacity=0.6)
-            tip = {"html": "<b>{ed_name}</b><br/>Vanished trips: {vanish_count}"}
-            st.pydeck_chart(pdk.Deck(map_style="mapbox://styles/mapbox/streets-v11",
-                                     initial_view_state=pdk.ViewState(latitude=53.35, longitude=-6.26, zoom=10.5),
-                                     layers=[layer], tooltip=tip))
-            st.caption("Legend: greener = fewer vanishes; deeper red = more (scaled to the city’s 95th percentile).")
-            st.download_button("Download ED vanish CSV",
-                               gdf_vanish.drop(columns="geometry").to_csv(index=False).encode("utf-8"),
-                               file_name=f"ed_vanish_counts_{ed_scope}_{date_sel}.csv",
-                               mime="text/csv")
+                layer = pdk.Layer(
+                    "PolygonLayer",
+                    data=gdf,
+                    get_polygon="polygon",
+                    get_fill_color="color",
+                    get_line_color=[60,60,60],
+                    line_width_min_pixels=1,
+                    pickable=True, stroked=True, opacity=0.6
+                )
+                st.pydeck_chart(pdk.Deck(
+                    map_style="mapbox://styles/mapbox/streets-v11",
+                    initial_view_state=pdk.ViewState(latitude=53.35, longitude=-6.26, zoom=10.5),
+                    layers=[layer], tooltip=tip))
+                st.caption(legend)
+                st.download_button("Download ED stress CSV",
+                                   gdf_stress.drop(columns="geometry").to_csv(index=False).encode("utf-8"),
+                                   file_name=f"ed_stress_{ed_metric}_{ed_scope}_{date_sel}.csv",
+                                   mime="text/csv")
+
+        # RIGHT: vanished counts polygons
+        with right_col:
+            st.markdown("**Vanished trips — count**")
+            space_px = 84 if ed_metric != "%>threshold" else 168
+            st.markdown(f"<div style='height:{space_px}px'></div>", unsafe_allow_html=True)
+            st.caption("Citywide vanish counts")
+            gdf_vanish = ed_vanish_counts(days_for_maps)
+            if gdf_vanish is None:
+                st.info("Could not load ED polygons.")
+            else:
+                draw = gdf_vanish.explode(index_parts=False).reset_index(drop=True)
+
+                def to_ring(geom):
+                    try:    return [list(x) for x in geom.exterior.coords]
+                    except: return None
+
+                draw["polygon"] = draw.geometry.apply(to_ring)
+                draw = draw.dropna(subset=["polygon"])
+                q95 = max(1, float(draw["vanish_count"].quantile(0.95))) if not draw.empty else 1.0
+                draw["color"] = draw["vanish_count"].apply(lambda c: stress_rgb(0.3 + 0.7*min(float(c)/q95, 1.0)))
+                layer = pdk.Layer("PolygonLayer", data=draw, get_polygon="polygon",
+                                  get_fill_color="color", get_line_color=[60,60,60],
+                                  line_width_min_pixels=1, pickable=True, stroked=True, opacity=0.6)
+                tip = {"html": "<b>{ed_name}</b><br/>Vanished trips: {vanish_count}"}
+                st.pydeck_chart(pdk.Deck(map_style="mapbox://styles/mapbox/streets-v11",
+                                         initial_view_state=pdk.ViewState(latitude=53.35, longitude=-6.26, zoom=10.5),
+                                         layers=[layer], tooltip=tip))
+                st.caption("Legend: greener = fewer vanishes; deeper red = more (scaled to the city’s 95th percentile).")
+                st.download_button("Download ED vanish CSV",
+                                   gdf_vanish.drop(columns="geometry").to_csv(index=False).encode("utf-8"),
+                                   file_name=f"ed_vanish_counts_{ed_scope}_{date_sel}.csv",
+                                   mime="text/csv")
 
 # ─── Methodology footer ─────────────────────────────────────────
 with st.expander("📘 Methodology & Glossary", expanded=False):
@@ -772,4 +875,4 @@ with st.expander("📘 Methodology & Glossary", expanded=False):
 """)
 
 st.caption(f"Data day: **{date_sel}** • Updated nightly")
-st.caption(f"Developed By - © Pinaki Pani")
+st.caption("Developed By - © Pinaki Pani")

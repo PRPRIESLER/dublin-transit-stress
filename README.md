@@ -114,6 +114,12 @@ dublin-transit-stress/
 
 ---
 
+## 🔑 Key Takeaway
+
+This project demonstrates how messy real-world transport data can be transformed into actionable insights about commuter experience. It combines data collection/cleaning/preparation, data engineering, anomaly detection, geospatial analytics, and dashboard deployment.
+
+---
+
 ## 📈 Future Work
 
 - Integrate **traffic congestion data (SCATS / other sources)**.
