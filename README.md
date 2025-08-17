@@ -100,7 +100,7 @@ dublin-transit-stress/
   _Passenger perception: wasted time inside the bus._
 
 - **Weather Overlay:**  
-  Stress intensified under rain, low temperature, or wind.
+  Stress intensified under rain and low/high temperature.
 
 ---
 
