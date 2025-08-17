@@ -5,7 +5,6 @@ norm_codes filter=lfs diff=lfs merge=lfs -text
 app filter=lfs diff=lfs merge=lfs -text
 cache filter=lfs diff=lfs merge=lfs -text
 data_live filter=lfs diff=lfs merge=lfs -text
-README.md filter=lfs diff=lfs merge=lfs -text
 collectors filter=lfs diff=lfs merge=lfs -text
 join_minute_with_weather.py filter=lfs diff=lfs merge=lfs -text
 join_daily.py filter=lfs diff=lfs merge=lfs -text
