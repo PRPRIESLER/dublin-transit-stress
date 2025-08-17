@@ -68,6 +68,7 @@ This project was inspired by those experiences. The goal is to **quantify “tra
 
 ## 📂 Repository Structure
 
+```
 dublin-transit-stress/
 │── app/ # Streamlit dashboard components
 │── collectors/ # GTFS-RT + weather collectors (ETL scripts)
@@ -79,6 +80,7 @@ dublin-transit-stress/
 │── notebooks/ # Jupyter notebooks for analysis/prototyping
 │── app.py # Main Streamlit dashboard
 │── requirements.txt # Python dependencies
+```
 
 ---
 
