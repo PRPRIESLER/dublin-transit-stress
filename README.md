@@ -68,7 +68,7 @@ This project was inspired by those experiences. The goal is to **quantify “tra
 
 ## 📂 Repository Structure
 
-```
+```bash
 dublin-transit-stress/
 │── app/ # Streamlit dashboard components
 │── collectors/ # GTFS-RT + weather collectors (ETL scripts)
