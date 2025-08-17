@@ -74,12 +74,13 @@ dublin-transit-stress/
 │── collectors/ # GTFS-RT + weather collectors (ETL scripts)
 │── data-hist/ # Historical datasets
 │── data-live/ # Live collected datasets
-│── GTFS-static/ # Filtered GTFS static reference files
+│── gtfs_static/ # Filtered GTFS static reference files
 │── logs/ # Logs of ETL runs
 │── cache/ # Cached files
 │── notebooks/ # Jupyter notebooks for analysis/prototyping
 │── app.py # Main Streamlit dashboard
 │── requirements.txt # Python dependencies
+│── runtime.txt # Python version
 ```
 
 ---
