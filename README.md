@@ -1,6 +1,6 @@
 # 🚌 Dublin Transit Stress Analysis
 
-**Live Demo** → [Hugging Face App](https://akii0-dublin-stress-analysis.hf.space/)
+**Live Demo** → [Hugging Face App](https://akii0-dublin-stress-analysis.hf.space/) (Allow some time for the application to load as it is Data Heavy)
 
 Measuring commuter stress in Dublin’s public bus system using **real-time GTFS-RT feeds**, **weather data**, and **geospatial analytics**.  
 This project collects, processes, and visualizes millions of vehicle positions to detect anomalies like vanished buses, severe delays, and stuck vehicles — all accessible through an interactive Streamlit dashboard.
