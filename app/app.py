@@ -623,7 +623,7 @@ else:
         k1.metric("Vanished trips", f"{len(ttv):,}")
         k2.metric("Median minutes", f"{med:.1f}", f"P25 {p25:.1f} / P75 {p75:.1f}")
         k3.metric("≤ 2 minutes", f"{early:.1f}%")
-        k4.metric("> 30 minutes", f"{late:.1f}%")
+        k4.metric("&gt; 30 minutes", f"{late:.1f}%")
 
         hist = (alt.Chart(ttv[ttv["mins"] <= 120])
                   .mark_bar()
